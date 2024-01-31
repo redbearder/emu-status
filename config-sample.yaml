@@ -1,0 +1,12 @@
+metricsInterval: 60
+palladium:
+  name: lipz01
+  cmd: "....../WXE/23.03.s000/bin/test_server -json"
+  racks:
+    - name: 0
+      clusterIDs: [0, 1, 2]
+    - name: 1
+      clusterIDs: [3, 4, 5]
+zebu:
+  name: zs5
+  cmd: "csh -c 'source ....../zebu/S-2021.09-2/zebu_env.csh; zRscManager -sysstat ....../zebu/zebu_system_dir/zebu_system_dir_3u12m'"
