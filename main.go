@@ -180,10 +180,10 @@ func GetPalladiumTestServerData(c ConfigModel, isTesting bool) PalladiumTestServ
 
 func ReformatPalladiumTestServerModel(m PalladiumTestServerModel) PalladiumTestServerModel {
 	if m.Clusters[0].LogicDrawer == nil {
-		m.Clusters[0].LogicDrawer = []PalladiumTestServerModelLogicDrawer{}
 		for i, _ := range m.Clusters {
+			m.Clusters[i].LogicDrawer = []PalladiumTestServerModelLogicDrawer{}
 			for j, _ := range m.Clusters[i].Board {
-				m.Clusters[0].LogicDrawer = append(m.Clusters[0].LogicDrawer, m.Clusters[i].Board[j])
+				m.Clusters[i].LogicDrawer = append(m.Clusters[i].LogicDrawer, m.Clusters[i].Board[j])
 			}
 		}
 	}
