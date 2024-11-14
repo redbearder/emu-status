@@ -19,16 +19,30 @@ import (
 	"time"
 )
 
+type PalladiumTestServerModelLogicDrawer struct {
+	ID              int    `json:"id"`
+	NumberOfDomains int    `json:"NumberOfDomains"`
+	Status          string `json:"Status"`
+	Domains         []struct {
+		ID          int    `json:"id"`
+		Owner       string `json:"Owner"`
+		Host        string `json:"Host"`
+		Pid         int    `json:"pid"`
+		Design      string `json:"Design"`
+		ElapsedTime string `json:"ElapsedTime"`
+	} `json:"Domains"`
+}
 
 type PalladiumTestServerModel struct {
 	Emulator     string `json:"Emulator"`
 	Hardware     string `json:"Hardware"`
 	SystemStatus string `json:"SystemStatus"`
 	Clusters     []struct {
-		ID          int    `json:"id"`
-		NumOfLD     int    `json:"numOfLD"`
-		Status      string `json:"status"`
-		LogicDrawer []struct {
+		ID          int                                   `json:"id"`
+		NumOfLD     int                                   `json:"numOfLD"`
+		Status      string                                `json:"status"`
+		LogicDrawer []PalladiumTestServerModelLogicDrawer `json:"LogicDrawer"`
+		Board       []struct {
 			ID              int    `json:"id"`
 			NumberOfDomains int    `json:"NumberOfDomains"`
 			Status          string `json:"Status"`
@@ -40,7 +54,7 @@ type PalladiumTestServerModel struct {
 				Design      string `json:"Design"`
 				ElapsedTime string `json:"ElapsedTime"`
 			} `json:"Domains"`
-		} `json:"LogicDrawer"`
+		} `json:"Board"`
 	} `json:"Clusters"`
 	AllTargetPods []struct {
 		RackID  int `json:"RackId"`
@@ -80,7 +94,7 @@ type ZebuBoardModel struct {
 }
 
 type ZebuStatusModel struct {
-	Boards []ZebuBoardModel `json:"boards"`
+	Boards       []ZebuBoardModel `json:"boards"`
 	Formatboards []struct {
 		Board  string `json:"board"`
 		Status string `json:"status"`
@@ -99,17 +113,17 @@ type ZebuStatusModel struct {
 
 type ConfigModel struct {
 	MetricsInterval int `yaml:"metricsInterval"`
-	Palladium struct {
-		Name              string `yaml:"name"`
-		Cmd string `yaml:"cmd"`
-		Racks             []struct {
+	Palladium       struct {
+		Name  string `yaml:"name"`
+		Cmd   string `yaml:"cmd"`
+		Racks []struct {
 			Name       int   `yaml:"name"`
 			ClusterIDs []int `yaml:"clusterIDs"`
 		} `yaml:"racks"`
 	} `yaml:"palladium"`
 	Zebu struct {
 		Name string `yaml:"name"`
-		Cmd string `yaml:"cmd"`
+		Cmd  string `yaml:"cmd"`
 	} `yaml:"zebu"`
 }
 
@@ -133,7 +147,7 @@ func ReadPalladiumTestServerDataTxt() []byte {
 
 // get status data from palladium command
 func ReadPalladiumTestServerData(c ConfigModel) []byte {
-	cmd := exec.Command("bash", "-c", "export NO_PLATFORM_REL_CHECK=1;" + c.Palladium.Cmd)
+	cmd := exec.Command("bash", "-c", "export NO_PLATFORM_REL_CHECK=1;"+c.Palladium.Cmd)
 	data, _ := cmd.Output()
 	return data
 }
@@ -143,7 +157,7 @@ func GetConfig() ConfigModel {
 	filePath := "config.yaml"
 
 	dat, _ := os.ReadFile(filepath.Join(wd, filePath))
-	config:= ConfigModel{}
+	config := ConfigModel{}
 	_ = yaml.Unmarshal(dat, &config)
 	return config
 }
@@ -160,6 +174,20 @@ func GetPalladiumTestServerData(c ConfigModel, isTesting bool) PalladiumTestServ
 
 	}
 	_ = json.Unmarshal(data, &m)
+
+	return ReformatPalladiumTestServerModel(m)
+}
+
+func ReformatPalladiumTestServerModel(m PalladiumTestServerModel) PalladiumTestServerModel {
+	if m.Clusters[0].LogicDrawer == nil {
+		m.Clusters[0].LogicDrawer = []PalladiumTestServerModelLogicDrawer{}
+		for i, _ := range m.Clusters {
+			for j, _ := range m.Clusters[i].Board {
+				m.Clusters[0].LogicDrawer = append(m.Clusters[0].LogicDrawer, m.Clusters[i].Board[j])
+			}
+		}
+	}
+
 	return m
 }
 
@@ -179,7 +207,7 @@ func ReadZebuStatusDataData(c ConfigModel) []byte {
 	return data
 }
 
-func GetZebuStatusData(c ConfigModel, isTesting bool) ([]string, [] string) {
+func GetZebuStatusData(c ConfigModel, isTesting bool) ([]string, []string) {
 	var data []byte
 
 	if isTesting {
@@ -191,7 +219,7 @@ func GetZebuStatusData(c ConfigModel, isTesting bool) ([]string, [] string) {
 	lines := strings.Split(string(data), "\n")
 
 	var (
-		statusList []string
+		statusList          []string
 		statusSmartZICEList []string
 	)
 
@@ -212,9 +240,9 @@ func GetZebuStatusObjData(statusList []string) ZebuStatusModel {
 	m := ZebuStatusModel{}
 	for _, status := range statusList {
 		var (
-			session string
-			user string
-			server string
+			session    string
+			user       string
+			server     string
 			statusType string
 		)
 		statusCols := strings.Split(status, " ")
@@ -226,14 +254,14 @@ func GetZebuStatusObjData(statusList []string) ZebuStatusModel {
 			statusType = statusCols[5]
 		}
 		b := ZebuBoardModel{
-			Unit: boardCols[0],
-			Module: boardCols[1],
-			System: boardCols[2],
-			Status: statusCols[1],
+			Unit:    boardCols[0],
+			Module:  boardCols[1],
+			System:  boardCols[2],
+			Status:  statusCols[1],
 			Session: session,
-			User: user,
-			Server: server,
-			Type: statusType,
+			User:    user,
+			Server:  server,
+			Type:    statusType,
 		}
 		m.Boards = append(m.Boards, b)
 	}
@@ -283,7 +311,7 @@ func ExportPalladiumMetrics(c ConfigModel, isTesting bool) {
 	if m.SystemStatus == "ONLINE" {
 		palladium_status_gauge.With(
 			prometheus.Labels{"emulator": m.Emulator},
-			).Set(1)
+		).Set(1)
 	} else {
 		palladium_status_gauge.With(
 			prometheus.Labels{"emulator": m.Emulator},
@@ -291,11 +319,11 @@ func ExportPalladiumMetrics(c ConfigModel, isTesting bool) {
 	}
 
 	palladium_cluster_status_gauge := promauto.NewGaugeVec(prometheus.GaugeOpts{
-			Name: "palladium_cluster_status",
-			Help: "palladium_cluster_status",
-		},
+		Name: "palladium_cluster_status",
+		Help: "palladium_cluster_status",
+	},
 		[]string{
-		"emulator", "rack", "cluster", "id",
+			"emulator", "rack", "cluster", "id",
 		},
 	)
 
@@ -322,29 +350,28 @@ func ExportPalladiumMetrics(c ConfigModel, isTesting bool) {
 	go func() {
 		for clusterIdx, cluster := range m.Clusters {
 			for _, rack := range c.Palladium.Racks {
-				if  contains(rack.ClusterIDs, clusterIdx) {
+				if contains(rack.ClusterIDs, clusterIdx) {
 					rackId = rack.Name
 				}
 			}
 			if cluster.Status == "ONLINE" {
 				palladium_cluster_status_gauge.With(
-					prometheus.Labels{"emulator": m.Emulator, "rack": strconv.Itoa(rackId), "cluster": strconv.Itoa(clusterIdx), "id": m.Emulator+"-rack"+strconv.Itoa(rackId)+"-cluster"+strconv.Itoa(clusterIdx)},
+					prometheus.Labels{"emulator": m.Emulator, "rack": strconv.Itoa(rackId), "cluster": strconv.Itoa(clusterIdx), "id": m.Emulator + "-rack" + strconv.Itoa(rackId) + "-cluster" + strconv.Itoa(clusterIdx)},
 				).Set(1)
 			} else {
 				palladium_cluster_status_gauge.With(
-					prometheus.Labels{"emulator": m.Emulator, "rack": strconv.Itoa(rackId), "cluster": strconv.Itoa(clusterIdx), "id": m.Emulator+"-rack"+strconv.Itoa(rackId)+"-cluster"+strconv.Itoa(clusterIdx)},
+					prometheus.Labels{"emulator": m.Emulator, "rack": strconv.Itoa(rackId), "cluster": strconv.Itoa(clusterIdx), "id": m.Emulator + "-rack" + strconv.Itoa(rackId) + "-cluster" + strconv.Itoa(clusterIdx)},
 				).Set(0)
 			}
-
 
 			for _, board := range cluster.LogicDrawer {
 				if board.Status == "ONLINE" {
 					palladium_cluster_board_status_gauge.With(
-						prometheus.Labels{"emulator": m.Emulator, "rack": strconv.Itoa(rackId), "cluster": strconv.Itoa(clusterIdx), "board": strconv.Itoa(board.ID), "id": m.Emulator+"-rack"+strconv.Itoa(rackId)+"-cluster"+strconv.Itoa(clusterIdx)+"-board"+strconv.Itoa(board.ID)},
+						prometheus.Labels{"emulator": m.Emulator, "rack": strconv.Itoa(rackId), "cluster": strconv.Itoa(clusterIdx), "board": strconv.Itoa(board.ID), "id": m.Emulator + "-rack" + strconv.Itoa(rackId) + "-cluster" + strconv.Itoa(clusterIdx) + "-board" + strconv.Itoa(board.ID)},
 					).Set(1)
 				} else {
 					palladium_cluster_board_status_gauge.With(
-						prometheus.Labels{"emulator": m.Emulator, "rack": strconv.Itoa(rackId), "cluster": strconv.Itoa(clusterIdx), "board": strconv.Itoa(board.ID), "id": m.Emulator+"-rack"+strconv.Itoa(rackId)+"-cluster"+strconv.Itoa(clusterIdx)+"-board"+strconv.Itoa(board.ID)},
+						prometheus.Labels{"emulator": m.Emulator, "rack": strconv.Itoa(rackId), "cluster": strconv.Itoa(clusterIdx), "board": strconv.Itoa(board.ID), "id": m.Emulator + "-rack" + strconv.Itoa(rackId) + "-cluster" + strconv.Itoa(clusterIdx) + "-board" + strconv.Itoa(board.ID)},
 					).Set(0)
 				}
 
@@ -354,15 +381,15 @@ func ExportPalladiumMetrics(c ConfigModel, isTesting bool) {
 						palladium_cluster_board_domain_status_gauge.With(
 							prometheus.Labels{
 								"emulator": m.Emulator,
-								"rack": strconv.Itoa(rackId),
-								"cluster": strconv.Itoa(clusterIdx),
-								"board": strconv.Itoa(board.ID),
-								"domain": strconv.Itoa(domainIdx),
-								"id": m.Emulator+"-rack"+strconv.Itoa(rackId)+"-cluster"+strconv.Itoa(clusterIdx)+"-board"+strconv.Itoa(board.ID)+"-domain"+strconv.Itoa(domainIdx),
-								"owner": "NONE",
-								"host": "UNKNOWN",
-								"pid": strconv.Itoa(domain.Pid),
-								"design": "",
+								"rack":     strconv.Itoa(rackId),
+								"cluster":  strconv.Itoa(clusterIdx),
+								"board":    strconv.Itoa(board.ID),
+								"domain":   strconv.Itoa(domainIdx),
+								"id":       m.Emulator + "-rack" + strconv.Itoa(rackId) + "-cluster" + strconv.Itoa(clusterIdx) + "-board" + strconv.Itoa(board.ID) + "-domain" + strconv.Itoa(domainIdx),
+								"owner":    "NONE",
+								"host":     "UNKNOWN",
+								"pid":      strconv.Itoa(domain.Pid),
+								"design":   "",
 							},
 						).Set(0)
 					} else {
@@ -370,19 +397,19 @@ func ExportPalladiumMetrics(c ConfigModel, isTesting bool) {
 						elapsedTime[2] = "h"
 						elapsedTime[5] = "m"
 						elapsedTimeStr := strings.Join(elapsedTime, "") + "s"
-						comp, _:= time.ParseDuration(elapsedTimeStr)
+						comp, _ := time.ParseDuration(elapsedTimeStr)
 						palladium_cluster_board_domain_status_gauge.With(
 							prometheus.Labels{
 								"emulator": m.Emulator,
-								"rack": strconv.Itoa(rackId),
-								"cluster": strconv.Itoa(clusterIdx),
-								"board": strconv.Itoa(board.ID),
-								"domain": strconv.Itoa(domainIdx),
-								"id": m.Emulator+"-rack"+strconv.Itoa(rackId)+"-cluster"+strconv.Itoa(clusterIdx)+"-board"+strconv.Itoa(board.ID)+"-domain"+strconv.Itoa(domainIdx),
-								"owner": domain.Owner,
-								"host": domain.Host,
-								"pid": strconv.Itoa(domain.Pid),
-								"design": domain.Design,
+								"rack":     strconv.Itoa(rackId),
+								"cluster":  strconv.Itoa(clusterIdx),
+								"board":    strconv.Itoa(board.ID),
+								"domain":   strconv.Itoa(domainIdx),
+								"id":       m.Emulator + "-rack" + strconv.Itoa(rackId) + "-cluster" + strconv.Itoa(clusterIdx) + "-board" + strconv.Itoa(board.ID) + "-domain" + strconv.Itoa(domainIdx),
+								"owner":    domain.Owner,
+								"host":     domain.Host,
+								"pid":      strconv.Itoa(domain.Pid),
+								"design":   domain.Design,
 							},
 						).Set(comp.Seconds())
 					}
@@ -397,8 +424,7 @@ func ExportPalladiumMetrics(c ConfigModel, isTesting bool) {
 
 }
 
-
-func main()  {
+func main() {
 	metricsBoolArg := flag.Bool("metrics", false, "start prometheus metrics exporter server")
 	testFormatDataBoolArg := flag.Bool("test", false, "test format data")
 	emuTypeArg := flag.String("emu", "", "emu type, palladium or zebu")
@@ -424,14 +450,14 @@ func main()  {
 			m := GetPalladiumTestServerData(c, *testFormatDataBoolArg)
 			boards, _ := GetPalladiumAvailableBoards(m, *emuBoardRequestNumArg, c)
 			// boards enough
-			bb, _ := json.Marshal(map[string]interface{}{"boards":boards})
+			bb, _ := json.Marshal(map[string]interface{}{"boards": boards})
 			fmt.Println(string(bb))
 		}
 
 		if *emuTypeArg == "zebu" {
 			l1, _ := GetZebuStatusData(c, *testFormatDataBoolArg)
 			m := GetZebuStatusObjData(l1)
-			bb, _ := json.Marshal(map[string]interface{}{"boards":m})
+			bb, _ := json.Marshal(map[string]interface{}{"boards": m})
 			fmt.Println(string(bb))
 		}
 	}
