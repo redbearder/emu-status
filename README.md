@@ -19,11 +19,17 @@
   * options: none
   * desc: indicate prometheus metrics server is available
 
+* --port=\<VALUE>
+  * type: int
+  * default: 27777
+  * options: none
+  * desc: indicate prometheus metrics exporter port
 ---
 
 # Example
 
 * --emu=palladium --metrics --test
 * --emu=palladium --metrics
+* --emu=palladium --metrics --port 9000
 * --emu=palladium --num=4 --test
 * --emu=palladium --num=4

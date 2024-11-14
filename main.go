@@ -426,6 +426,7 @@ func ExportPalladiumMetrics(c ConfigModel, isTesting bool) {
 
 func main() {
 	metricsBoolArg := flag.Bool("metrics", false, "start prometheus metrics exporter server")
+	metricsPort := flag.Int("port", 27777, "prometheus metrics exporter port")
 	testFormatDataBoolArg := flag.Bool("test", false, "test format data")
 	emuTypeArg := flag.String("emu", "", "emu type, palladium or zebu")
 	emuBoardRequestNumArg := flag.Int("num", 1, "emu board request num")
@@ -443,7 +444,7 @@ func main() {
 		}
 
 		http.Handle("/metrics", promhttp.Handler())
-		http.ListenAndServe(":27777", nil)
+		http.ListenAndServe(":"+strconv.Itoa(*metricsPort), nil)
 
 	} else {
 		if *emuTypeArg == "palladium" {
