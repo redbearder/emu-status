@@ -338,8 +338,13 @@ func ExportPalladiumMetrics(c ConfigModel, isTesting bool) {
 
 	go func() {
 		for {
+			palladium_status_gauge.Reset()
+			palladium_cluster_status_gauge.Reset()
+			palladium_cluster_board_status_gauge.Reset()
+			palladium_cluster_board_domain_status_gauge.Reset()
 
 			m := GetPalladiumTestServerData(c, isTesting)
+
 			if m.SystemStatus == "ONLINE" {
 				palladium_status_gauge.With(
 					prometheus.Labels{"emulator": m.Emulator},
