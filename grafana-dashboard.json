@@ -25,7 +25,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cbf6e0be-94f0-42cf-a936-c8df44b49834"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -103,7 +103,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cbf6e0be-94f0-42cf-a936-c8df44b49834"
+            "uid": "${datasource}"
           },
           "editorMode": "code",
           "expr": "palladium_status",
@@ -118,7 +118,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cbf6e0be-94f0-42cf-a936-c8df44b49834"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -185,6 +185,14 @@
               {
                 "id": "unit",
                 "value": "percentunit"
+              },
+              {
+                "id": "custom.axisSoftMax",
+                "value": 1
+              },
+              {
+                "id": "custom.axisSoftMin",
+                "value": 0
               }
             ]
           }
@@ -213,7 +221,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cbf6e0be-94f0-42cf-a936-c8df44b49834"
+            "uid": "${datasource}"
           },
           "editorMode": "code",
           "expr": "count(palladium_cluster_board_domain_status{owner!=\"NONE\"})",
@@ -224,7 +232,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cbf6e0be-94f0-42cf-a936-c8df44b49834"
+            "uid": "${datasource}"
           },
           "editorMode": "code",
           "expr": "count(palladium_cluster_board_domain_status)",
@@ -236,7 +244,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cbf6e0be-94f0-42cf-a936-c8df44b49834"
+            "uid": "${datasource}"
           },
           "editorMode": "code",
           "expr": "count(palladium_cluster_board_domain_status{owner!=\"NONE\"}) / count(palladium_cluster_board_domain_status)",
@@ -252,7 +260,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cbf6e0be-94f0-42cf-a936-c8df44b49834"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -406,7 +414,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cbf6e0be-94f0-42cf-a936-c8df44b49834"
+            "uid": "${datasource}"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -492,7 +500,205 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cbf6e0be-94f0-42cf-a936-c8df44b49834"
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 15,
+        "x": 9,
+        "y": 8
+      },
+      "id": 4,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum by(owner) (palladium_cluster_board_domain_status{owner!=\"NONE\"})",
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "用户使用总时长",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 15,
+        "x": 9,
+        "y": 18
+      },
+      "id": 5,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "count by(owner) (palladium_cluster_board_domain_status{owner!=\"NONE\"})",
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "count(palladium_cluster_board_domain_status)",
+          "hide": false,
+          "legendFormat": "总数",
+          "range": true,
+          "refId": "B"
+        }
+      ],
+      "title": "用户使用Domain总数",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -508,6 +714,7 @@
             "inspect": false
           },
           "mappings": [],
+          "min": 0.01,
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -520,7 +727,8 @@
                 "value": 0.01
               }
             ]
-          }
+          },
+          "unit": "none"
         },
         "overrides": [
           {
@@ -570,7 +778,7 @@
                     },
                     {
                       "color": "#EAB839",
-                      "value": 49
+                      "value": 50
                     },
                     {
                       "color": "red",
@@ -583,8 +791,20 @@
                 "id": "custom.cellOptions",
                 "value": {
                   "mode": "gradient",
-                  "type": "color-background"
+                  "type": "gauge"
                 }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "cluster"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 241
               }
             ]
           }
@@ -593,8 +813,8 @@
       "gridPos": {
         "h": 19,
         "w": 9,
-        "x": 9,
-        "y": 8
+        "x": 0,
+        "y": 27
       },
       "id": 7,
       "options": {
@@ -615,7 +835,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cbf6e0be-94f0-42cf-a936-c8df44b49834"
+            "uid": "${datasource}"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -630,7 +850,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cbf6e0be-94f0-42cf-a936-c8df44b49834"
+            "uid": "${datasource}"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -697,7 +917,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cbf6e0be-94f0-42cf-a936-c8df44b49834"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -705,6 +925,7 @@
             "mode": "thresholds"
           },
           "mappings": [],
+          "min": 4,
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -721,14 +942,15 @@
                 "value": 24
               }
             ]
-          }
+          },
+          "unit": "none"
         },
         "overrides": []
       },
       "gridPos": {
         "h": 9,
         "w": 9,
-        "x": 0,
+        "x": 9,
         "y": 27
       },
       "id": 6,
@@ -752,7 +974,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cbf6e0be-94f0-42cf-a936-c8df44b49834"
+            "uid": "${datasource}"
           },
           "editorMode": "builder",
           "expr": "sort_desc(count by(owner) (palladium_cluster_board_domain_status{owner!=\"NONE\"}))",
@@ -764,204 +986,6 @@
       "title": "用户使用资源排行",
       "transformations": [],
       "type": "bargauge"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "cbf6e0be-94f0-42cf-a936-c8df44b49834"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "s"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 10,
-        "w": 15,
-        "x": 9,
-        "y": 27
-      },
-      "id": 4,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "cbf6e0be-94f0-42cf-a936-c8df44b49834"
-          },
-          "editorMode": "code",
-          "expr": "sum by(owner) (palladium_cluster_board_domain_status{owner!=\"NONE\"})",
-          "legendFormat": "__auto",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "用户使用总时长",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "cbf6e0be-94f0-42cf-a936-c8df44b49834"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "none"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 9,
-        "w": 15,
-        "x": 9,
-        "y": 37
-      },
-      "id": 5,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "cbf6e0be-94f0-42cf-a936-c8df44b49834"
-          },
-          "editorMode": "code",
-          "expr": "count by(owner) (palladium_cluster_board_domain_status{owner!=\"NONE\"})",
-          "legendFormat": "__auto",
-          "range": true,
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "cbf6e0be-94f0-42cf-a936-c8df44b49834"
-          },
-          "editorMode": "code",
-          "expr": "count(palladium_cluster_board_domain_status)",
-          "hide": false,
-          "legendFormat": "总数",
-          "range": true,
-          "refId": "B"
-        }
-      ],
-      "title": "用户使用Domain总数",
-      "type": "timeseries"
     }
   ],
   "refresh": "",
@@ -980,17 +1004,35 @@
         "name": "Filters",
         "skipUrlSync": false,
         "type": "adhoc"
+      },
+      {
+        "current": {
+          "selected": true,
+          "text": "lanxin-monitor",
+          "value": "lanxin-monitor"
+        },
+        "hide": 0,
+        "includeAll": false,
+        "multi": false,
+        "name": "datasource",
+        "options": [],
+        "query": "prometheus",
+        "queryValue": "",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "type": "datasource"
       }
     ]
   },
   "time": {
-    "from": "now-12h",
+    "from": "now-6h",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "Palladium Monitor",
   "uid": "c4cb2732-c5c8-443e-9953-da5041effe1b",
-  "version": 12,
+  "version": 18,
   "weekStart": ""
 }
