@@ -81,7 +81,7 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 12,
+        "w": 5,
         "x": 0,
         "y": 0
       },
@@ -106,7 +106,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "palladium_status",
+          "expr": "palladium_status{emulator=~\"$emulator\"}",
           "legendFormat": "{{instance}}",
           "range": true,
           "refId": "A"
@@ -114,6 +114,152 @@
       ],
       "title": "UP",
       "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "max": 1,
+          "min": 0.01,
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "#EAB839",
+                "value": 50
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 4,
+        "x": 5,
+        "y": 0
+      },
+      "id": 8,
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "text": {}
+      },
+      "pluginVersion": "9.5.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "count(palladium_cluster_board_domain_status{owner!=\"NONE\",emulator=~\"$emulator\"}) / count(palladium_cluster_board_domain_status{emulator=~\"$emulator\"})",
+          "instant": false,
+          "legendFormat": "Utilization",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Utilization",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "max": 1,
+          "min": 0.01,
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "#EAB839",
+                "value": 50
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 4,
+        "x": 9,
+        "y": 0
+      },
+      "id": 9,
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "text": {}
+      },
+      "pluginVersion": "9.5.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "count(palladium_cluster_board_domain_status{owner!=\"NONE\",emulator=~\"$emulator\"}) / count(palladium_cluster_board_domain_status{emulator=~\"$emulator\"})",
+          "instant": false,
+          "legendFormat": "Avg Utilization",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Avg Utilization",
+      "type": "gauge"
     },
     {
       "datasource": {
@@ -200,8 +346,8 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 12,
-        "x": 12,
+        "w": 11,
+        "x": 13,
         "y": 0
       },
       "id": 2,
@@ -224,7 +370,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "count(palladium_cluster_board_domain_status{owner!=\"NONE\"})",
+          "expr": "count(palladium_cluster_board_domain_status{owner!=\"NONE\",emulator=~\"$emulator\"})",
           "legendFormat": "RunningDomain",
           "range": true,
           "refId": "A"
@@ -235,7 +381,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "count(palladium_cluster_board_domain_status)",
+          "expr": "count(palladium_cluster_board_domain_status{emulator=~\"$emulator\"})",
           "hide": false,
           "legendFormat": "AllDomain",
           "range": true,
@@ -247,7 +393,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "count(palladium_cluster_board_domain_status{owner!=\"NONE\"}) / count(palladium_cluster_board_domain_status)",
+          "expr": "count(palladium_cluster_board_domain_status{owner!=\"NONE\",emulator=~\"$emulator\"}) / count(palladium_cluster_board_domain_status{emulator=~\"$emulator\"})",
           "hide": false,
           "legendFormat": "Utilization",
           "range": true,
@@ -256,6 +402,201 @@
       ],
       "title": "Usage",
       "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "cbf6e0be-94f0-42cf-a936-c8df44b49834"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 5,
+        "x": 0,
+        "y": 8
+      },
+      "id": 10,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "9.5.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "cbf6e0be-94f0-42cf-a936-c8df44b49834"
+          },
+          "editorMode": "code",
+          "expr": "count(palladium_cluster_status{emulator=~\"$emulator\"})",
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Clusters",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "cbf6e0be-94f0-42cf-a936-c8df44b49834"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 5,
+        "x": 5,
+        "y": 8
+      },
+      "id": 11,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "9.5.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "cbf6e0be-94f0-42cf-a936-c8df44b49834"
+          },
+          "editorMode": "code",
+          "expr": "count(palladium_cluster_board_status{emulator=~\"$emulator\"})",
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Boards",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "cbf6e0be-94f0-42cf-a936-c8df44b49834"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 5,
+        "x": 10,
+        "y": 8
+      },
+      "id": 12,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "9.5.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "cbf6e0be-94f0-42cf-a936-c8df44b49834"
+          },
+          "editorMode": "code",
+          "expr": "count(palladium_cluster_board_domain_status{emulator=~\"$emulator\"})",
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Domains",
+      "type": "stat"
     },
     {
       "datasource": {
@@ -314,7 +655,7 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 69
+                "value": 127
               }
             ]
           },
@@ -390,10 +731,10 @@
         ]
       },
       "gridPos": {
-        "h": 19,
-        "w": 9,
+        "h": 22,
+        "w": 12,
         "x": 0,
-        "y": 8
+        "y": 16
       },
       "id": 3,
       "options": {
@@ -407,7 +748,12 @@
           "show": false
         },
         "showHeader": true,
-        "sortBy": []
+        "sortBy": [
+          {
+            "desc": false,
+            "displayName": "instance"
+          }
+        ]
       },
       "pluginVersion": "9.5.2",
       "targets": [
@@ -418,7 +764,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "palladium_cluster_board_domain_status{}",
+          "expr": "palladium_cluster_board_domain_status{emulator=~\"$emulator\"}",
           "format": "table",
           "instant": true,
           "interval": "",
@@ -454,29 +800,30 @@
               "Value": true,
               "__name__": true,
               "design": false,
-              "emulator": true,
+              "emulator": false,
               "id": true,
-              "instance": true,
+              "instance": false,
               "job": true,
               "pid": true,
               "rack": true
             },
             "indexByName": {
-              "Time": 0,
+              "Time": 2,
               "Value": 14,
-              "__name__": 1,
-              "board": 3,
-              "cluster": 2,
-              "design": 5,
-              "domain": 4,
-              "emulator": 6,
-              "host": 7,
-              "id": 8,
-              "instance": 9,
+              "__name__": 3,
+              "board": 5,
+              "cluster": 4,
+              "design": 7,
+              "domain": 6,
+              "emulator": 1,
+              "host": 8,
+              "id": 9,
+              "instance": 0,
               "job": 10,
               "owner": 11,
               "pid": 12,
-              "rack": 13
+              "rack": 13,
+              "使用时间(小时)": 15
             },
             "renameByName": {
               "Value": ""
@@ -557,9 +904,9 @@
       },
       "gridPos": {
         "h": 10,
-        "w": 15,
-        "x": 9,
-        "y": 8
+        "w": 12,
+        "x": 12,
+        "y": 16
       },
       "id": 4,
       "options": {
@@ -581,7 +928,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "sum by(owner) (palladium_cluster_board_domain_status{owner!=\"NONE\"})",
+          "expr": "sum by(owner) (palladium_cluster_board_domain_status{owner!=\"NONE\",emulator=~\"$emulator\"})",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -649,10 +996,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 9,
-        "w": 15,
-        "x": 9,
-        "y": 18
+        "h": 12,
+        "w": 12,
+        "x": 12,
+        "y": 26
       },
       "id": 5,
       "options": {
@@ -674,7 +1021,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "count by(owner) (palladium_cluster_board_domain_status{owner!=\"NONE\"})",
+          "expr": "count by(owner) (palladium_cluster_board_domain_status{owner!=\"NONE\",emulator=~\"$emulator\"})",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -685,7 +1032,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "count(palladium_cluster_board_domain_status)",
+          "expr": "count(palladium_cluster_board_domain_status{emulator=~\"$emulator\"})",
           "hide": false,
           "legendFormat": "总数",
           "range": true,
@@ -814,7 +1161,7 @@
         "h": 19,
         "w": 9,
         "x": 0,
-        "y": 27
+        "y": 38
       },
       "id": 7,
       "options": {
@@ -839,7 +1186,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "count by(cluster, board) (palladium_cluster_board_domain_status{owner!=\"NONE\"})",
+          "expr": "count by(cluster, board) (palladium_cluster_board_domain_status{owner!=\"NONE\",emulator=~\"$emulator\"})",
           "format": "table",
           "hide": false,
           "instant": true,
@@ -854,7 +1201,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "count by(cluster, board) (palladium_cluster_board_domain_status)",
+          "expr": "count by(cluster, board) (palladium_cluster_board_domain_status{emulator=~\"$emulator\"})",
           "format": "table",
           "instant": true,
           "interval": "",
@@ -948,10 +1295,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 9,
+        "h": 19,
         "w": 9,
         "x": 9,
-        "y": 27
+        "y": 38
       },
       "id": 6,
       "options": {
@@ -976,14 +1323,14 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "editorMode": "builder",
-          "expr": "sort_desc(count by(owner) (palladium_cluster_board_domain_status{owner!=\"NONE\"}))",
+          "editorMode": "code",
+          "expr": "sort_desc(count by(owner) (palladium_cluster_board_domain_status{owner!=\"NONE\",emulator=~\"$emulator\"}))",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "用户使用资源排行",
+      "title": "用户占有资源排行",
       "transformations": [],
       "type": "bargauge"
     }
@@ -1007,7 +1354,7 @@
       },
       {
         "current": {
-          "selected": true,
+          "selected": false,
           "text": "lanxin-monitor",
           "value": "lanxin-monitor"
         },
@@ -1022,17 +1369,50 @@
         "regex": "",
         "skipUrlSync": false,
         "type": "datasource"
+      },
+      {
+        "current": {
+          "selected": true,
+          "text": [
+            "sz-emu",
+            "plt-palladium"
+          ],
+          "value": [
+            "sz-emu",
+            "plt-palladium"
+          ]
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "cbf6e0be-94f0-42cf-a936-c8df44b49834"
+        },
+        "definition": "label_values(palladium_status,emulator)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "emulator",
+        "multi": true,
+        "name": "emulator",
+        "options": [],
+        "query": {
+          "query": "label_values(palladium_status,emulator)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
       }
     ]
   },
   "time": {
-    "from": "now-6h",
+    "from": "now-3h",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "Palladium Monitor",
   "uid": "c4cb2732-c5c8-443e-9953-da5041effe1b",
-  "version": 18,
+  "version": 33,
   "weekStart": ""
 }
