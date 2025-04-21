@@ -19,20 +19,6 @@ import (
 	"time"
 )
 
-type PalladiumTestServerModelLogicDrawer struct {
-	ID              int    `json:"id"`
-	NumberOfDomains int    `json:"NumberOfDomains"`
-	Status          string `json:"Status"`
-	Domains         []struct {
-		ID          int    `json:"id"`
-		Owner       string `json:"Owner"`
-		Host        string `json:"Host"`
-		Pid         int    `json:"pid"`
-		Design      string `json:"Design"`
-		ElapsedTime string `json:"ElapsedTime"`
-	} `json:"Domains"`
-}
-
 type PalladiumTestServerModel struct {
 	Emulator     string `json:"Emulator"`
 	Hardware     string `json:"Hardware"`
@@ -82,6 +68,20 @@ type PalladiumTestServerModel struct {
 	} `json:"UnavailableTpods"`
 }
 
+type PalladiumTestServerModelLogicDrawer struct {
+	ID              int    `json:"id"`
+	NumberOfDomains int    `json:"NumberOfDomains"`
+	Status          string `json:"Status"`
+	Domains         []struct {
+		ID          int    `json:"id"`
+		Owner       string `json:"Owner"`
+		Host        string `json:"Host"`
+		Pid         int    `json:"pid"`
+		Design      string `json:"Design"`
+		ElapsedTime string `json:"ElapsedTime"`
+	} `json:"Domains"`
+}
+
 type ZebuBoardModel struct {
 	Unit    string `json:"unit"`
 	Module  string `json:"module"`
@@ -119,6 +119,7 @@ type ConfigModel struct {
 		Racks []struct {
 			Name       int   `yaml:"name"`
 			ClusterIDs []int `yaml:"clusterIDs"`
+			BoardIDs []int `yaml:"boardIDs"`
 		} `yaml:"racks"`
 	} `yaml:"palladium"`
 	Zebu struct {
@@ -338,12 +339,12 @@ func ExportPalladiumMetrics(c ConfigModel, isTesting bool) {
 
 	go func() {
 		for {
+			m := GetPalladiumTestServerData(c, isTesting)
+
 			palladium_status_gauge.Reset()
 			palladium_cluster_status_gauge.Reset()
 			palladium_cluster_board_status_gauge.Reset()
 			palladium_cluster_board_domain_status_gauge.Reset()
-
-			m := GetPalladiumTestServerData(c, isTesting)
 
 			if m.SystemStatus == "ONLINE" {
 				palladium_status_gauge.With(
@@ -357,72 +358,77 @@ func ExportPalladiumMetrics(c ConfigModel, isTesting bool) {
 
 			for clusterIdx, cluster := range m.Clusters {
 				for _, rack := range c.Palladium.Racks {
-					if contains(rack.ClusterIDs, clusterIdx) {
+					if contains(rack.ClusterIDs, cluster.ID) {
 						rackId = rack.Name
-					}
-				}
-				if cluster.Status == "ONLINE" {
-					palladium_cluster_status_gauge.With(
-						prometheus.Labels{"emulator": m.Emulator, "rack": strconv.Itoa(rackId), "cluster": strconv.Itoa(clusterIdx), "id": m.Emulator + "-rack" + strconv.Itoa(rackId) + "-cluster" + strconv.Itoa(clusterIdx)},
-					).Set(1)
-				} else {
-					palladium_cluster_status_gauge.With(
-						prometheus.Labels{"emulator": m.Emulator, "rack": strconv.Itoa(rackId), "cluster": strconv.Itoa(clusterIdx), "id": m.Emulator + "-rack" + strconv.Itoa(rackId) + "-cluster" + strconv.Itoa(clusterIdx)},
-					).Set(0)
-				}
 
-				for _, board := range cluster.LogicDrawer {
-					if board.Status == "ONLINE" {
-						palladium_cluster_board_status_gauge.With(
-							prometheus.Labels{"emulator": m.Emulator, "rack": strconv.Itoa(rackId), "cluster": strconv.Itoa(clusterIdx), "board": strconv.Itoa(board.ID), "id": m.Emulator + "-rack" + strconv.Itoa(rackId) + "-cluster" + strconv.Itoa(clusterIdx) + "-board" + strconv.Itoa(board.ID)},
-						).Set(1)
-					} else {
-						palladium_cluster_board_status_gauge.With(
-							prometheus.Labels{"emulator": m.Emulator, "rack": strconv.Itoa(rackId), "cluster": strconv.Itoa(clusterIdx), "board": strconv.Itoa(board.ID), "id": m.Emulator + "-rack" + strconv.Itoa(rackId) + "-cluster" + strconv.Itoa(clusterIdx) + "-board" + strconv.Itoa(board.ID)},
-						).Set(0)
-					}
-
-					for domainIdx, domain := range board.Domains {
-						// domain free
-						if domain.Pid == 0 {
-							palladium_cluster_board_domain_status_gauge.With(
-								prometheus.Labels{
-									"emulator": m.Emulator,
-									"rack":     strconv.Itoa(rackId),
-									"cluster":  strconv.Itoa(clusterIdx),
-									"board":    strconv.Itoa(board.ID),
-									"domain":   strconv.Itoa(domainIdx),
-									"id":       m.Emulator + "-rack" + strconv.Itoa(rackId) + "-cluster" + strconv.Itoa(clusterIdx) + "-board" + strconv.Itoa(board.ID) + "-domain" + strconv.Itoa(domainIdx),
-									"owner":    "NONE",
-									"host":     "UNKNOWN",
-									"pid":      strconv.Itoa(domain.Pid),
-									"design":   "",
-								},
-							).Set(0)
+						if cluster.Status == "ONLINE" {
+							palladium_cluster_status_gauge.With(
+								prometheus.Labels{"emulator": m.Emulator, "rack": strconv.Itoa(rackId), "cluster": strconv.Itoa(clusterIdx), "id": m.Emulator + "-rack" + strconv.Itoa(rackId) + "-cluster" + strconv.Itoa(clusterIdx)},
+							).Set(1)
 						} else {
-							elapsedTime := strings.Split(domain.ElapsedTime, "")
-							elapsedTime[2] = "h"
-							elapsedTime[5] = "m"
-							elapsedTimeStr := strings.Join(elapsedTime, "") + "s"
-							comp, _ := time.ParseDuration(elapsedTimeStr)
-							palladium_cluster_board_domain_status_gauge.With(
-								prometheus.Labels{
-									"emulator": m.Emulator,
-									"rack":     strconv.Itoa(rackId),
-									"cluster":  strconv.Itoa(clusterIdx),
-									"board":    strconv.Itoa(board.ID),
-									"domain":   strconv.Itoa(domainIdx),
-									"id":       m.Emulator + "-rack" + strconv.Itoa(rackId) + "-cluster" + strconv.Itoa(clusterIdx) + "-board" + strconv.Itoa(board.ID) + "-domain" + strconv.Itoa(domainIdx),
-									"owner":    domain.Owner,
-									"host":     domain.Host,
-									"pid":      strconv.Itoa(domain.Pid),
-									"design":   domain.Design,
-								},
-							).Set(comp.Seconds())
+							palladium_cluster_status_gauge.With(
+								prometheus.Labels{"emulator": m.Emulator, "rack": strconv.Itoa(rackId), "cluster": strconv.Itoa(clusterIdx), "id": m.Emulator + "-rack" + strconv.Itoa(rackId) + "-cluster" + strconv.Itoa(clusterIdx)},
+							).Set(0)
+						}
+
+						for _, board := range cluster.LogicDrawer {
+							if contains(rack.BoardIDs, board.ID) {
+								if board.Status == "ONLINE" {
+									palladium_cluster_board_status_gauge.With(
+										prometheus.Labels{"emulator": m.Emulator, "rack": strconv.Itoa(rackId), "cluster": strconv.Itoa(clusterIdx), "board": strconv.Itoa(board.ID), "id": m.Emulator + "-rack" + strconv.Itoa(rackId) + "-cluster" + strconv.Itoa(clusterIdx) + "-board" + strconv.Itoa(board.ID)},
+									).Set(1)
+								} else {
+									palladium_cluster_board_status_gauge.With(
+										prometheus.Labels{"emulator": m.Emulator, "rack": strconv.Itoa(rackId), "cluster": strconv.Itoa(clusterIdx), "board": strconv.Itoa(board.ID), "id": m.Emulator + "-rack" + strconv.Itoa(rackId) + "-cluster" + strconv.Itoa(clusterIdx) + "-board" + strconv.Itoa(board.ID)},
+									).Set(0)
+								}
+
+								for domainIdx, domain := range board.Domains {
+									// domain free
+									if domain.Pid == 0 {
+										palladium_cluster_board_domain_status_gauge.With(
+											prometheus.Labels{
+												"emulator": m.Emulator,
+												"rack":     strconv.Itoa(rackId),
+												"cluster":  strconv.Itoa(clusterIdx),
+												"board":    strconv.Itoa(board.ID),
+												"domain":   strconv.Itoa(domainIdx),
+												"id":       m.Emulator + "-rack" + strconv.Itoa(rackId) + "-cluster" + strconv.Itoa(clusterIdx) + "-board" + strconv.Itoa(board.ID) + "-domain" + strconv.Itoa(domainIdx),
+												"owner":    "NONE",
+												"host":     "UNKNOWN",
+												"pid":      strconv.Itoa(domain.Pid),
+												"design":   "",
+											},
+										).Set(0)
+									} else {
+										elapsedTime := strings.Split(domain.ElapsedTime, "")
+										elapsedTime[2] = "h"
+										elapsedTime[5] = "m"
+										elapsedTimeStr := strings.Join(elapsedTime, "") + "s"
+										comp, _ := time.ParseDuration(elapsedTimeStr)
+										palladium_cluster_board_domain_status_gauge.With(
+											prometheus.Labels{
+												"emulator": m.Emulator,
+												"rack":     strconv.Itoa(rackId),
+												"cluster":  strconv.Itoa(clusterIdx),
+												"board":    strconv.Itoa(board.ID),
+												"domain":   strconv.Itoa(domainIdx),
+												"id":       m.Emulator + "-rack" + strconv.Itoa(rackId) + "-cluster" + strconv.Itoa(clusterIdx) + "-board" + strconv.Itoa(board.ID) + "-domain" + strconv.Itoa(domainIdx),
+												"owner":    domain.Owner,
+												"host":     domain.Host,
+												"pid":      strconv.Itoa(domain.Pid),
+												"design":   domain.Design,
+											},
+										).Set(comp.Seconds())
+									}
+								}
+							}
+
+
 						}
 					}
-
 				}
+
 
 			}
 
