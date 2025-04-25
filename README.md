@@ -33,3 +33,15 @@
 * --emu=palladium --metrics --port 9000
 * --emu=palladium --num=4 --test
 * --emu=palladium --num=4
+
+
+# Build
+
+```azure
+CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o emu-status .
+```
+
+# Run
+```azure
+nohup ./emu-status -emu palladium -metrics --port 9000 > emu-status.out 2>&1 &
+```
